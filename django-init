@@ -1,0 +1,131 @@
+#!/usr/bin/env python
+
+'''
+    Yii Application Initialization Tool
+
+    In order to run in non-interactive mode: init --env=Development --overwrite=n
+'''
+from importlib import import_module
+import os
+import shutil
+import filecmp
+import sys
+
+def get_params():
+    params = {}
+    for arg in sys.argv:
+        if arg.startswith('--'):
+            (name, value) = arg.split("=")
+            name = name[2:]
+            params[name] = value
+    return params
+
+
+def get_file_list(path):
+    list = []
+    for folder, sub_folder, files in os.walk(path):
+        for file in files:
+            if file.endswith(('.git', '.svn')):
+                continue
+            try:
+                folder = folder.split(path + '/', 1)[1]
+            except IndexError:
+                folder = ''
+            list.append(os.path.join(folder, file))
+    return list
+
+
+def copy_file(root, source, target):
+    global overwrite_all, params
+    if not os.path.isfile(root + '/' + source):
+        print("       skip " + target + " (" + source + " not exist)")
+        return True
+
+    if os.path.isfile(root + '/' + target):
+        if filecmp.cmp(root + '/' + source, root + '/' + target):
+            print("   unchanged " + target)
+            return True
+        if overwrite_all:
+            print("   overwrite " + target)
+        else:
+            print("   exist " + target)
+            print("         ...overwrite? [Yes|No|All|Quit] ", end='')
+
+            answer = params['overwrite'] if 'overwrite' in params else input()
+
+            if 'q' in answer.lower():
+                return False
+            elif 'a' in answer.lower():
+                overwrite_all = True
+                print("   overwrite " + target)
+            elif 'y' in answer.lower():
+                print("   overwrite " + target)
+            elif 'n' in answer.lower():
+                print("   skip " + target)
+                return True
+    else:
+        print("   generate " + target)
+        os.makedirs(os.path.dirname(root + '/' + target), exist_ok=True)
+    shutil.copyfile(root + '/' + source, root + '/' + target)
+    return True
+
+
+def set_writable():
+    pass
+
+
+def set_executable():
+    pass
+
+envs = import_module('environments').ENVIRONMENTS
+params = get_params()
+root = os.path.dirname(os.path.abspath(__file__))
+envNames = list(envs)
+envName = None
+env = None
+overwrite_all = False
+
+print("Django Application Initialization Tool v1.0\n")
+
+if 'env' not in params:
+    print("Which environment do you want the application to be initialized in?\n")
+    for i, name in enumerate(envNames):
+        print('  [' + str(i) + '] ' + name)
+    print("\n  Your choice [0-" + str(len(envNames) - 1) + ', or "q" to quit] ', end='')
+    try:
+        answer = int(input())
+    except ValueError:
+        answer = -1
+    if not (0 <= answer < len(envNames)):
+        exit("\n  Quit initialization.")
+    envName = envNames[answer]
+else:
+    envName = params['env']
+
+if envName not in envNames:
+    envsList = ", ".join(envNames)
+    print("\n  "+envName+" is not a valid environment. Try one of the following: "+envsList+". ")
+    exit()
+
+env = envs[envName]
+
+if 'env' not in params:
+    print("\n  Initialize the application under '" + envName + "' environment? [yes|no] ", end='')
+    answer = input()
+    if 'y' not in answer.lower():
+        exit("\n  Quit initialization.")
+
+
+print("\n  Start initialization ...")
+
+files = get_file_list(root + '/environments/' + env['path'])
+for file in files:
+    if not copy_file(root, 'environments/' + env['path'] + '/' + file, file):
+        break
+
+callbacks = ['set_writable', 'set_executable'];
+for callback in callbacks:
+    if callback in env:
+        globals()[callback](env[callback])
+
+print("\n  ... initialization completed.\n")
