@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/django-environment.iml" filepath="$PROJECT_DIR$/.idea/django-environment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/django-init.iml" filepath="$PROJECT_DIR$/.idea/django-init.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/django-inits.iml" filepath="$PROJECT_DIR$/.idea/django-inits.iml" />
     </modules>
   </component>
 </project>

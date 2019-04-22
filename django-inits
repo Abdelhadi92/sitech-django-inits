@@ -1,9 +1,11 @@
-#!python
+#!/usr/bin/env python
 
 '''
-    Yii Application Initialization Tool
+    Django Application Initialization Tool
 
-    In order to run in non-interactive mode: init --env=Development --overwrite=n
+    In order to run in non-interactive mode:
+
+    init --env=Development --overwrite=n
 '''
 from importlib import import_module
 import os
@@ -69,17 +71,17 @@ def copy_file(root, source, target):
     shutil.copyfile(root + '/' + source, root + '/' + target)
     return True
 
-
-def set_writable():
-    pass
-
-
-def set_executable():
-    pass
-
-envs = import_module('environments').ENVIRONMENTS
 params = get_params()
-root = os.path.dirname(os.path.abspath(__file__))
+root = os.getcwd()
+
+try:
+    sys.path.append(os.getcwd())
+    envs = import_module('environments').ENVIRONMENTS
+except:
+    print("Please defined the environments module before the initialize.")
+    exit()
+
+
 envNames = list(envs)
 envName = None
 env = None
@@ -122,10 +124,5 @@ files = get_file_list(root + '/environments/' + env['path'])
 for file in files:
     if not copy_file(root, 'environments/' + env['path'] + '/' + file, file):
         break
-
-callbacks = ['set_writable', 'set_executable'];
-for callback in callbacks:
-    if callback in env:
-        globals()[callback](env[callback])
 
 print("\n  ... initialization completed.\n")
