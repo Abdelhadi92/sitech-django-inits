@@ -10,7 +10,7 @@ Environment tools for Django, used to set configuration depending on the server 
 
 ## Usage
 
- - Go to the root of the project and create new directory called "__environments__".
+ - Go to the root of your project and create new directory called "__environments__".
  
  - In "__environments_" directory  create new file called "**\_\_init\_\_.py**".
 
