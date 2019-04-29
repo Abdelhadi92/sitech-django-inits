@@ -15,6 +15,7 @@ Environment tools for Django, used to set configuration depending on the server 
  - In "__environments__" directory  create new file called "**\_\_init\_\_.py**".
 
  - In the  "**\_\_init\_\_.py**" define the details of your environments in "**ENVIRONMENTS**" dictionary.
+ - Define the settings files 
 
 
 <br />
@@ -66,9 +67,12 @@ DATABASES = {
   }  
 }
 ```
+- Go to terminal and run the following command:
 
-
-
+    
+```bash
+ django-inits
+```
 
 ## Commands
 
